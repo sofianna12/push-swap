@@ -1,0 +1,114 @@
+name: Claude AI PR Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches:
+      - main
+
+jobs:
+  claude-review:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Build binaries
+        id: build
+        run: |
+          go build -o push-swap ./cmd/push-swap 2>/dev/null && echo "built=true" >> $GITHUB_OUTPUT || echo "built=false" >> $GITHUB_OUTPUT
+          go build -o checker ./cmd/checker 2>/dev/null || true
+        continue-on-error: true
+
+      - name: Run operation count benchmark
+        id: opcount
+        if: steps.build.outputs.built == 'true'
+        run: |
+          # n=5 worst case over 10 runs
+          MAX5=0
+          for i in $(seq 10); do
+            ARG=$(shuf -i 1-100 -n 5 | tr '\n' ' ')
+            COUNT=$(./push-swap $ARG 2>/dev/null | wc -l || echo 999)
+            [ "$COUNT" -gt "$MAX5" ] && MAX5=$COUNT
+          done
+          echo "max_ops_5=$MAX5" >> $GITHUB_OUTPUT
+
+          # n=100 worst case over 5 runs
+          MAX100=0
+          for i in $(seq 5); do
+            ARG=$(shuf -i 1-10000 -n 100 | tr '\n' ' ')
+            COUNT=$(./push-swap $ARG 2>/dev/null | wc -l || echo 9999)
+            [ "$COUNT" -gt "$MAX100" ] && MAX100=$COUNT
+          done
+          echo "max_ops_100=$MAX100" >> $GITHUB_OUTPUT
+        continue-on-error: true
+
+      - name: Claude AI Review
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          model: claude-opus-4-6
+          direct_prompt: |
+            You are reviewing a Pull Request for the push-swap Go project.
+
+            ## Project Context
+            - Two binaries: `push-swap` (sorts integers using 11 stack ops) and `checker` (validates instruction sequences)
+            - Package structure: `internal/stack/`, `internal/operations/`, `internal/sort/`, `internal/parser/`, `cmd/push-swap/`, `cmd/checker/`
+            - Only standard library packages are allowed — no external dependencies
+            - Error output: exactly `"Error\n"` to stderr, then `os.Exit(1)` — never to stdout
+
+            ## Critical Constraints
+            - n=5 sort: MUST use fewer than 12 instructions
+            - n=6 sort: MUST use fewer than 9 instructions
+            - n=100 sort: MUST use fewer than 700 instructions
+
+            ## Operation Count Results From This PR
+            - n=5 worst case over 10 runs: ${{ steps.opcount.outputs.max_ops_5 || 'N/A (binaries not built yet)' }} (limit: <12)
+            - n=100 worst case over 5 runs: ${{ steps.opcount.outputs.max_ops_100 || 'N/A (binaries not built yet)' }} (limit: <700)
+
+            ## Architecture Rules
+            - `internal/stack` imports only stdlib
+            - `internal/operations` imports only `internal/stack`
+            - `internal/parser` imports only stdlib
+            - `internal/sort` imports only `internal/stack` and `internal/operations`
+            - No global mutable state; no `init()` functions
+            - No `require` block in `go.mod`
+
+            ## Please Review For
+
+            ### BLOCKING Issues (must fix before merge)
+            - Errors going to stdout instead of stderr
+            - Error message not exactly `"Error"` (extra detail violates spec)
+            - Panics on edge case inputs (empty stack, single element)
+            - External dependencies added to `go.mod`
+            - Operation counts exceeding spec limits
+            - Missing duplicate or non-integer validation
+            - Architecture violations (wrong package importing wrong package)
+
+            ### Code Quality (warnings)
+            - gofmt compliance
+            - go vet issues
+            - Missing godoc comments on exported symbols
+            - Missing error checks (unhandled `_`)
+            - No `init()` functions
+
+            ### Test Quality (warnings)
+            - Missing tests for new functions
+            - Tests not table-driven with `t.Run()`
+            - Missing edge cases (empty stack, single element, error paths)
+
+            ## Output Format
+            Structure your review with clear sections. End with:
+            **Verdict: APPROVE / REQUEST CHANGES / NEEDS DISCUSSION**
