@@ -27,7 +27,7 @@ coverage.html
 .DS_Store
 Thumbs.db
 
-# Claude Code (development tooling)
+# Claude Code (development tooling — Theo only, not shared with team)
 CLAUDE.md
 CLAUDE.local.md
 .claude/
@@ -36,3 +36,4 @@ OFFICIAL_AUDITS.md
 INTRA_SPECS.md
 PROMPT_1_STRUCTURE_GUIDE.md
 PROMPT_2_PROJECT_GENERATOR.md
+.clauignore
