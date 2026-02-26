@@ -1,0 +1,67 @@
+name: Changelog
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  changelog:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate changelog entry
+        id: changelog
+        run: |
+          TAG="${{ github.ref_name }}"
+          PREV_TAG=$(git tag --sort=-version:refname | grep -v "^${TAG}$" | head -1)
+          echo "Generating changelog from ${PREV_TAG:-initial commit} to ${TAG}"
+
+          if [ -z "$PREV_TAG" ]; then
+            COMMITS=$(git log --pretty=format:"- %s" HEAD)
+          else
+            COMMITS=$(git log --pretty=format:"- %s" "${PREV_TAG}..HEAD")
+          fi
+
+          FEATS=$(echo "$COMMITS" | grep "^- feat" || true)
+          FIXES=$(echo "$COMMITS" | grep "^- fix" || true)
+          PERF=$(echo "$COMMITS" | grep "^- perf" || true)
+          DOCS=$(echo "$COMMITS" | grep "^- docs" || true)
+          CHORE=$(echo "$COMMITS" | grep "^- chore\|^- ci\|^- refactor\|^- test" || true)
+
+          DATE=$(date +%Y-%m-%d)
+          {
+            echo "## [$TAG] - $DATE"
+            echo ""
+            [ -n "$FEATS" ]  && echo "### Added"  && echo "$FEATS"  && echo ""
+            [ -n "$FIXES" ]  && echo "### Fixed"  && echo "$FIXES"  && echo ""
+            [ -n "$PERF" ]   && echo "### Changed" && echo "$PERF"  && echo ""
+            [ -n "$DOCS" ]   && echo "### Documentation" && echo "$DOCS" && echo ""
+            [ -n "$CHORE" ]  && echo "### Chore"  && echo "$CHORE" && echo ""
+          } > new_entry.md
+
+          cat new_entry.md
+
+      - name: Prepend to CHANGELOG.md
+        run: |
+          TAG="${{ github.ref_name }}"
+          # Insert new entry after the [Unreleased] section header line
+          awk '/^## \[Unreleased\]/{print; print ""; system("cat new_entry.md"); next}1' CHANGELOG.md > CHANGELOG.tmp
+          mv CHANGELOG.tmp CHANGELOG.md
+          rm new_entry.md
+
+      - name: Commit updated CHANGELOG
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add CHANGELOG.md
+          git commit -m "docs: update CHANGELOG for ${{ github.ref_name }}"
+          git push origin HEAD:main

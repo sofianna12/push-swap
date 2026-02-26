@@ -1,0 +1,35 @@
+name: Dependabot (reference)
+
+# NOTE: Dependabot is not a workflow — it is configured via .github/dependabot.yml
+# This file exists only as documentation. The actual config is below.
+# To enable: create .github/dependabot.yml with the content shown in the comments.
+#
+# .github/dependabot.yml content:
+#
+# version: 2
+# updates:
+#   - package-ecosystem: gomod
+#     directory: /
+#     schedule:
+#       interval: weekly
+#     open-pull-requests-limit: 5
+#     labels:
+#       - dependencies
+#     commit-message:
+#       prefix: chore
+#       include: scope
+#
+# For this project (stdlib-only, no require block in go.mod),
+# dependabot has nothing to update. Enable it when external dependencies are added.
+
+on:
+  workflow_dispatch:
+
+jobs:
+  info:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Info
+        run: |
+          echo "Dependabot is configured via .github/dependabot.yml, not as a workflow."
+          echo "See comments in this file for the configuration to use."

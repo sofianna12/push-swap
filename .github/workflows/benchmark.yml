@@ -1,0 +1,75 @@
+name: Benchmark
+
+# Manual trigger only — not wired to any automatic event.
+# To use: GitHub → Actions → Benchmark → Run workflow
+# Runs Go benchmarks and reports operation counts for n=5, n=6, n=100.
+on:
+  workflow_dispatch:
+    inputs:
+      runs:
+        description: 'Number of random runs for n=100'
+        required: false
+        default: '10'
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Run Go benchmarks
+        run: go test -bench=. -benchmem -count=3 ./internal/sort/ || echo "No benchmarks defined yet"
+
+      - name: Build binaries
+        run: |
+          go build -o push-swap ./cmd/push-swap
+          go build -o checker ./cmd/checker
+
+      - name: Operation count — n=5 (20 random inputs)
+        run: |
+          MAX=0; MIN=9999; TOTAL=0
+          for i in $(seq 20); do
+            ARG=$(shuf -i 1-100 -n 5 | tr '\n' ' ')
+            COUNT=$(./push-swap "$ARG" | wc -l)
+            [ "$COUNT" -gt "$MAX" ] && MAX=$COUNT
+            [ "$COUNT" -lt "$MIN" ] && MIN=$COUNT
+            TOTAL=$((TOTAL + COUNT))
+          done
+          AVG=$((TOTAL / 20))
+          echo "n=5 → min=$MIN max=$MAX avg=$AVG (limit: <12)"
+          [ "$MAX" -lt 12 ] || echo "WARNING: worst case $MAX exceeds limit of 12"
+
+      - name: Operation count — n=6 (20 random inputs)
+        run: |
+          MAX=0; MIN=9999; TOTAL=0
+          for i in $(seq 20); do
+            ARG=$(shuf -i 1-100 -n 6 | tr '\n' ' ')
+            COUNT=$(./push-swap "$ARG" | wc -l)
+            [ "$COUNT" -gt "$MAX" ] && MAX=$COUNT
+            [ "$COUNT" -lt "$MIN" ] && MIN=$COUNT
+            TOTAL=$((TOTAL + COUNT))
+          done
+          AVG=$((TOTAL / 20))
+          echo "n=6 → min=$MIN max=$MAX avg=$AVG (limit: <9)"
+          [ "$MAX" -lt 9 ] || echo "WARNING: worst case $MAX exceeds limit of 9"
+
+      - name: Operation count — n=100 (${{ inputs.runs }} random inputs)
+        run: |
+          RUNS=${{ inputs.runs }}
+          MAX=0; MIN=9999; TOTAL=0
+          for i in $(seq "$RUNS"); do
+            ARG=$(shuf -i 1-10000 -n 100 | tr '\n' ' ')
+            COUNT=$(./push-swap "$ARG" | wc -l)
+            [ "$COUNT" -gt "$MAX" ] && MAX=$COUNT
+            [ "$COUNT" -lt "$MIN" ] && MIN=$COUNT
+            TOTAL=$((TOTAL + COUNT))
+          done
+          AVG=$((TOTAL / RUNS))
+          echo "n=100 → min=$MIN max=$MAX avg=$AVG (limit: <700)"
+          [ "$MAX" -lt 700 ] || echo "WARNING: worst case $MAX exceeds limit of 700"
