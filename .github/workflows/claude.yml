@@ -59,8 +59,7 @@ jobs:
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          model: claude-opus-4-6
-          direct_prompt: |
+          prompt: |
             You are reviewing a Pull Request for the push-swap Go project.
 
             ## Project Context
