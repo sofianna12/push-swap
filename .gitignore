@@ -31,9 +31,22 @@ Thumbs.db
 CLAUDE.md
 CLAUDE.local.md
 .claude/
-SPEC.md
 OFFICIAL_AUDITS.md
 INTRA_SPECS.md
 PROMPT_1_STRUCTURE_GUIDE.md
 PROMPT_2_PROJECT_GENERATOR.md
 .clauignore
+# env file
+.env
+
+# Editor/IDE
+# .idea/
+# .vscode/
+
+
+.clauignore
+CLAUDE.md
+CLAUDE.local.md
+INTRA_SPECS.md
+OFFICIAL_AUDITS.md
+.claude/
