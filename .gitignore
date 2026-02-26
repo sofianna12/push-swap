@@ -1,6 +1,6 @@
 # Executables
-push-swap
-checker
+/push-swap
+/checker
 
 # Go build artifacts
 *.exe
