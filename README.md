@@ -73,15 +73,19 @@ stack         → stdlib only
 ## Development
 
 ```bash
-# Run all tests
-go test ./...
+# Run all tests (with race detector — detects concurrency bugs if any are introduced)
+go test -race ./...
 
-# Check formatting (lists unformatted files) and static analysis
+# Check formatting — lists files that are not correctly formatted
 gofmt -l .
+# Fix formatting in place
+gofmt -w .
+
+# Static analysis — catches real bugs: wrong format strings, unreachable code, etc.
 go vet ./...
 
 # Test coverage
-go test -coverprofile=coverage.out ./...
+go test -race -coverprofile=coverage.out ./...
 go tool cover -func=coverage.out
 ```
 
