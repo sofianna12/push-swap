@@ -48,7 +48,7 @@ os.Exit 1]
     F -->|yes| G([Exit — no output])
     F -->|no| H[stack.New a with nums
 stack.New b empty]
-    H --> I[Read line from stdin]
+    H --> I[Read next line from stdin]
     I --> J{EOF?}
     J -->|no| K[strings.TrimSpace]
     K --> L{empty line?}
@@ -57,41 +57,9 @@ stack.New b empty]
     M --> N{known op?}
     N -->|no| O[print Error to stderr
 os.Exit 1]
-    N -->|yes| I
-    J -->|yes| P{a.IsSorted AND
+    N -->|yes — op executed| I
+    J -->|yes — all instructions done| P{a.IsSorted AND
 b.Len == 0?}
     P -->|yes| Q([print OK])
     P -->|no| R([print KO])
-```
-
----
-
-## sort algorithm decision tree
-
-```mermaid
-flowchart TD
-    A[sort.Sort called] --> B{a.Len?}
-    B -->|0 or 1| C[return — already sorted]
-    B -->|2| D[sortTwo
-sa if top > second]
-    B -->|3| E[sortThree
-hardcoded 5-case
-decision tree]
-    B -->|4| F[sortSmall
-pb min
-sortThree
-pa]
-    B -->|5| G[sortSmall
-pb min twice
-sortThree
-pa pa]
-    B -->|6| H[sortSmall
-pb min three times
-sortThree
-pa pa pa]
-    B -->|> 6| I[sortLarge
-normalise ranks
-chunk into sqrt n groups
-push chunks to b
-pull back to a sorted]
 ```
