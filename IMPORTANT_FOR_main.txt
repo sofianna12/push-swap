@@ -1,0 +1,14 @@
+Here I will add commented out for the main function, as it is not needed for the tests, but it will be useful for anyone who wants to run the program with command line arguments.
+
+After commiting parser and sort for large
+
+ vals, err := parser.ParseArgs(os.Args[1:])
+ if err != nil { fmt.Fprintln(os.Stderr, "Error"); os.Exit(1) }
+ if helper.IsSorted(vals) { return }
+
+ a := stack.New()
+ b := stack.New()
+ for _, v := range vals { a.Push(v) }
+
+ ops := large.Sort(a, b) // or small.Sort for <=5 elsewhere
+for _, op := range ops { if op != "" { fmt.Println(op) } }
