@@ -40,13 +40,5 @@ PROMPT_2_PROJECT_GENERATOR.md
 .env
 
 # Editor/IDE
-# .idea/
-# .vscode/
-
-
-.clauignore
-CLAUDE.md
-CLAUDE.local.md
-INTRA_SPECS.md
-OFFICIAL_AUDITS.md
-.claude/
+.idea/
+.vscode/
