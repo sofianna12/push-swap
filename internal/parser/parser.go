@@ -10,7 +10,7 @@ import (
 // ErrInvalidInput is returned when the provided arguments are not valid push-swap numbers.
 //
 // This covers bad tokens (like "one"), duplicates, sign-only values, and numbers
-// outside int32 boundaries.
+// outside int boundaries.
 var ErrInvalidInput = errors.New("invalid input")
 
 // ParseArgs converts raw CLI args into a validated integer slice.
@@ -33,7 +33,7 @@ func ParseArgs(args []string) ([]int, error) {
 			continue
 		}
 
-		n64, err := parseInt32(tok)
+		n64, err := parseInt(tok)
 		if err != nil {
 			return nil, ErrInvalidInput
 		}
@@ -61,20 +61,20 @@ func splitArgs(args []string) []string {
 	return tokens
 }
 
-// parseInt32 parses a single token as base-10 int32.
+// parseInt parses a single token as base-10 int.
 //
 // It rejects sign-only values, non-integers, and out-of-range numbers.
-func parseInt32(tok string) (int64, error) {
-	// ParseInt with bitSize=32 enforces int32 limits; we still catch sign-only input.
+func parseInt(tok string) (int64, error) {
+	// ParseInt with bitSize=64 allows full parsing first; int bounds are checked below.
 	if tok == "+" || tok == "-" {
 		return 0, errors.New("sign only")
 	}
-	n, err := strconv.ParseInt(tok, 10, 32)
+	n, err := strconv.ParseInt(tok, 10, 64)
 	if err != nil {
 		return 0, err
 	}
-	if n < math.MinInt32 || n > math.MaxInt32 {
-		return 0, errors.New("out of int32 range")
+	if n < int64(math.MinInt) || n > int64(math.MaxInt) {
+		return 0, errors.New("out of int range")
 	}
 	return n, nil
 }

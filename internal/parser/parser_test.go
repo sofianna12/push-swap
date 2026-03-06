@@ -1,6 +1,10 @@
 package parser
 
-import "testing"
+import (
+	"math"
+	"strconv"
+	"testing"
+)
 
 // TestParseArgs_OK checks the most common valid input shapes we expect from CLI usage.
 func TestParseArgs_OK(t *testing.T) {
@@ -9,12 +13,15 @@ func TestParseArgs_OK(t *testing.T) {
 		args []string
 		want []int
 	}{
+		{"nil args", nil, []int{}},
 		{"no args", []string{}, []int{}},
 		{"only whitespace", []string{"   "}, []int{}},
 		{"separate args", []string{"1", "2", "3"}, []int{1, 2, 3}},
 		{"single quoted arg", []string{"1 2 3"}, []int{1, 2, 3}},
 		{"mixed quoted and split", []string{"1 2", "3", "4 5"}, []int{1, 2, 3, 4, 5}},
 		{"negative values", []string{"-1 -2", "0", "5"}, []int{-1, -2, 0, 5}},
+		{"int boundaries", []string{strconv.Itoa(math.MinInt), strconv.Itoa(math.MaxInt)}, []int{math.MinInt, math.MaxInt}},
+		{"order preserved", []string{"3 1 2"}, []int{3, 1, 2}},
 	}
 
 	for _, tt := range tests {
@@ -43,10 +50,11 @@ func TestParseArgs_Invalid(t *testing.T) {
 	}{
 		{"non numeric token", []string{"1", "a"}},
 		{"float token", []string{"1.2"}},
+		{"plus sign only token", []string{"+"}},
 		{"sign only token", []string{"-"}},
 		{"duplicate numbers", []string{"1 2 3 2"}},
-		{"int32 overflow", []string{"2147483648"}},   // max int32 + 1
-		{"int32 underflow", []string{"-2147483649"}}, // min int32 - 1
+		{"int64 overflow", []string{"9223372036854775808"}},
+		{"int64 underflow", []string{"-9223372036854775809"}},
 	}
 
 	for _, tt := range tests {

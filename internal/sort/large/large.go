@@ -3,6 +3,9 @@ package large
 import (
 	"sort"
 
+	// NOTE: These internal imports are correct in the full push-swap module.
+	// If go.mod or sibling packages are missing in a trimmed workspace snapshot,
+	// editors may temporarily flag them as unresolved.
 	"push-swap/internal/helper"
 	"push-swap/internal/stack"
 )
@@ -18,7 +21,7 @@ func Sort(a, b *stack.Stack) []string {
 	}
 
 	// Rank compression: value -> rank [0..n-1]
-	rank := buildRank(vals)
+	rankMap := buildRank(vals)
 
 	// Choose chunk size (common heuristic)
 	n := len(vals)
@@ -40,9 +43,9 @@ func Sort(a, b *stack.Stack) []string {
 			limit = n
 		}
 
-		for countInWindow(a, rank, nextRank, limit) > 0 {
+		for countInWindow(a, rankMap, nextRank, limit) > 0 {
 			// Bring an element whose rank is in [nextRank, limit) to top of A
-			up, down := distanceToWindow(a, rank, nextRank, limit)
+			up, down := distanceToWindow(a, rankMap, nextRank, limit)
 
 			if up <= down {
 				for i := 0; i < up; i++ {
@@ -65,9 +68,9 @@ func Sort(a, b *stack.Stack) []string {
 
 			// Small heuristic: if the pushed rank is in lower half of the window,
 			// rotate B to keep bigger ranks nearer the top.
-			top := b.Peek()
-			if top != nil {
-				r := rank[*top]
+			top, ok := b.Peek()
+			if ok {
+				r := rankMap[top]
 				mid := (nextRank + limit) / 2
 				if r < mid {
 					if op := stack.Rb(b); op != "" {
@@ -82,7 +85,7 @@ func Sort(a, b *stack.Stack) []string {
 
 	// Push back from B to A by always extracting the current max in B
 	for b.Len() > 0 {
-		up, down := distanceToMax(b, rank)
+		up, down := distanceToMax(b, rankMap)
 		if up <= down {
 			for i := 0; i < up; i++ {
 				if op := stack.Rb(b); op != "" {
@@ -108,19 +111,19 @@ func Sort(a, b *stack.Stack) []string {
 func buildRank(vals []int) map[int]int {
 	cp := append([]int(nil), vals...)
 	sort.Ints(cp)
-	r := make(map[int]int, len(cp))
+	rankMap := make(map[int]int, len(cp))
 	for i, v := range cp {
-		r[v] = i
+		rankMap[v] = i
 	}
-	return r
+	return rankMap
 }
 
 // countInWindow returns how many values in A have ranks inside [lo, hi).
 func countInWindow(a *stack.Stack, rank map[int]int, lo, hi int) int {
 	c := 0
 	for _, v := range a.Values() {
-		r := rank[v]
-		if r >= lo && r < hi {
+		valueRank := rank[v]
+		if valueRank >= lo && valueRank < hi {
 			c++
 		}
 	}
@@ -134,16 +137,16 @@ func distanceToWindow(a *stack.Stack, rank map[int]int, lo, hi int) (up int, dow
 	n := len(vals)
 	up = n
 	for i, v := range vals {
-		r := rank[v]
-		if r >= lo && r < hi {
+		valueRank := rank[v]
+		if valueRank >= lo && valueRank < hi {
 			up = i
 			break
 		}
 	}
 	down = n
 	for i := n - 1; i >= 0; i-- {
-		r := rank[vals[i]]
-		if r >= lo && r < hi {
+		valueRank := rank[vals[i]]
+		if valueRank >= lo && valueRank < hi {
 			down = n - i
 			break
 		}
@@ -166,9 +169,9 @@ func distanceToMax(b *stack.Stack, rank map[int]int) (up int, down int) {
 	maxIdx := 0
 	maxRank := -1
 	for i, v := range vals {
-		r := rank[v]
-		if r > maxRank {
-			maxRank = r
+		valueRank := rank[v]
+		if valueRank > maxRank {
+			maxRank = valueRank
 			maxIdx = i
 		}
 	}
