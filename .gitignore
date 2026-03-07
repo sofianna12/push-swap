@@ -31,3 +31,8 @@ go.work.sum
 .idea/
 .vscode/
 .clauignore
+.claude/
+
+# Local development notes (personal, not for team)
+CLAUDE.md
+CLAUDE.local.md
