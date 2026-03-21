@@ -70,7 +70,7 @@ func Sort(a, b *stack.Stack) []string {
 	}
 
 	// Push back all elements from B to A
-	for !b.IsEmpty() {
+	for b.Len() > 0 {
 		ops = append(ops, stack.Pa(a, b))
 	}
 
