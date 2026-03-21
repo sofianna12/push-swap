@@ -54,7 +54,7 @@ func cloneInts(in []int) []int {
 }
 
 func buildStacks(values []int) (*stack.Stack, *stack.Stack) {
-	return stack.New(cloneInts(values)), stack.New([]int{})
+	return stack.New("a", cloneInts(values)), stack.New("b", []int{})
 }
 
 // TestSortLarge_SortsAndEmptiesB validates the basic contract of Sort:
