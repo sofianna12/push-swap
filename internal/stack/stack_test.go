@@ -55,3 +55,27 @@ func TestValuesImmutability(t *testing.T) {
 		t.Fatalf("expected original stack unchanged, got %v", a.Values())
 	}
 }
+
+func TestIsSorted(t *testing.T) {
+	tests := []struct {
+		name string
+		in   []int
+		want bool
+	}{
+		{"empty", []int{}, true},
+		{"single", []int{5}, true},
+		{"sorted ascending", []int{1, 2, 3, 4}, true},
+		{"unsorted", []int{2, 1, 3}, false},
+		{"reverse sorted", []int{3, 2, 1}, false},
+		{"two sorted", []int{1, 2}, true},
+		{"two unsorted", []int{2, 1}, false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			s := New("a", tt.in)
+			if got := s.IsSorted(); got != tt.want {
+				t.Fatalf("IsSorted(%v) = %v, want %v", tt.in, got, tt.want)
+			}
+		})
+	}
+}

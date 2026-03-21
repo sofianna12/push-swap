@@ -77,3 +77,14 @@ func (s *Stack) Values() []int {
 	copy(cp, s.data)
 	return cp
 }
+
+// IsSorted reports whether the stack is sorted in ascending order from top to bottom.
+// An empty stack or a single-element stack is always considered sorted.
+func (s *Stack) IsSorted() bool {
+	for i := 1; i < len(s.data); i++ {
+		if s.data[i-1] > s.data[i] {
+			return false
+		}
+	}
+	return true
+}
