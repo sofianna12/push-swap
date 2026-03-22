@@ -35,6 +35,11 @@ func main() {
 		}
 	}
 
+	if err := scanner.Err(); err != nil {
+		fmt.Fprintln(os.Stderr, "Error")
+		os.Exit(1)
+	}
+
 	if a.IsSorted() && b.Len() == 0 {
 		fmt.Println("OK")
 	} else {
