@@ -7,13 +7,17 @@ import (
 	"push-swap/internal/stack"
 )
 
-// sortLarge sorts stack a when it contains more than 6 elements.
-// It uses stack b as auxiliary storage and returns the operation names executed.
-//
-// Strategy — rank-based chunking (Turkish algorithm):
+// sortLarge sorts stack a when it contains more than 6 elements using
+// rank-based chunking (Turkish algorithm):
 //  1. Compress values to ranks 0..n-1 so chunk boundaries are uniform.
-//  2. Push values from a to b in rank windows (chunks), rotating a to minimise moves.
+//  2. Push values from a to b in rank windows (chunks), rotating a to minimize moves.
 //  3. Pull from b back to a by always bringing the current maximum rank to the top.
+//
+// Parameters:
+//   - a: the primary stack (more than 6 elements).
+//   - b: the auxiliary stack, must be empty on entry.
+//
+// Returns the operation names executed, or nil if already sorted.
 func sortLarge(a, b *stack.Stack) []string {
 	vals := a.Values()
 	if len(vals) <= 1 || a.IsSorted() {
@@ -33,7 +37,6 @@ func sortLarge(a, b *stack.Stack) []string {
 
 	ops := make([]string, 0, n*8)
 
-	// Push to b in chunks by rank window.
 	nextRank := 0
 	for nextRank < n {
 		limit := nextRank + chunk
@@ -59,7 +62,6 @@ func sortLarge(a, b *stack.Stack) []string {
 			operations.Pb(a, b)
 			ops = append(ops, "pb")
 
-			// Heuristic: rotate b so bigger ranks stay near the top.
 			top, ok := b.Peek()
 			if ok {
 				mid := (nextRank + limit) / 2
@@ -73,7 +75,6 @@ func sortLarge(a, b *stack.Stack) []string {
 		nextRank = limit
 	}
 
-	// Pull from b back to a by always extracting the current maximum rank.
 	for b.Len() > 0 {
 		up, down := distanceToMax(b, rankMap)
 		if up <= down {
@@ -95,6 +96,11 @@ func sortLarge(a, b *stack.Stack) []string {
 }
 
 // buildRank maps each value to its sorted position (rank) in the input set.
+//
+// Parameters:
+//   - vals: the original stack values.
+//
+// Returns a map from value to rank (0-indexed).
 func buildRank(vals []int) map[int]int {
 	cp := append([]int(nil), vals...)
 	sort.Ints(cp)
@@ -106,6 +112,13 @@ func buildRank(vals []int) map[int]int {
 }
 
 // countInWindow returns how many values in a have ranks inside [lo, hi).
+//
+// Parameters:
+//   - a: the stack to scan.
+//   - rank: value-to-rank mapping.
+//   - lo, hi: inclusive lower and exclusive upper rank bounds.
+//
+// Returns the count of matching elements.
 func countInWindow(a *stack.Stack, rank map[int]int, lo, hi int) int {
 	c := 0
 	for _, v := range a.Values() {
@@ -116,8 +129,15 @@ func countInWindow(a *stack.Stack, rank map[int]int, lo, hi int) int {
 	return c
 }
 
-// distanceToWindow returns the minimum forward (up) and backward (down) rotations
+// distanceToWindow returns the minimum forward and backward rotations
 // needed to bring any element with rank in [lo, hi) to the top of a.
+//
+// Parameters:
+//   - a: the stack to scan.
+//   - rank: value-to-rank mapping.
+//   - lo, hi: inclusive lower and exclusive upper rank bounds.
+//
+// Returns (up, down): rotations via ra and rra respectively.
 func distanceToWindow(a *stack.Stack, rank map[int]int, lo, hi int) (up int, down int) {
 	vals := a.Values()
 	n := len(vals)
@@ -145,7 +165,13 @@ func distanceToWindow(a *stack.Stack, rank map[int]int, lo, hi int) (up int, dow
 }
 
 // distanceToMax returns the rotations needed to bring the highest-rank element
-// in b to the top using either rb or rrb.
+// in b to the top.
+//
+// Parameters:
+//   - b: the stack to scan.
+//   - rank: value-to-rank mapping.
+//
+// Returns (up, down): rotations via rb and rrb respectively.
 func distanceToMax(b *stack.Stack, rank map[int]int) (up int, down int) {
 	vals := b.Values()
 	n := len(vals)

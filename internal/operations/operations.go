@@ -9,7 +9,10 @@ package operations
 import "push-swap/internal/stack"
 
 // Sa swaps the top two elements of stack a.
-// Does nothing if a has fewer than two elements.
+// No-op if a has fewer than two elements.
+//
+// Parameters:
+//   - a: the stack to swap on.
 func Sa(a *stack.Stack) {
 	if a.Len() < 2 {
 		return
@@ -21,7 +24,10 @@ func Sa(a *stack.Stack) {
 }
 
 // Sb swaps the top two elements of stack b.
-// Does nothing if b has fewer than two elements.
+// No-op if b has fewer than two elements.
+//
+// Parameters:
+//   - b: the stack to swap on.
 func Sb(b *stack.Stack) {
 	if b.Len() < 2 {
 		return
@@ -33,13 +39,21 @@ func Sb(b *stack.Stack) {
 }
 
 // Ss executes Sa and Sb simultaneously.
+//
+// Parameters:
+//   - a: stack a to swap on.
+//   - b: stack b to swap on.
 func Ss(a, b *stack.Stack) {
 	Sa(a)
 	Sb(b)
 }
 
 // Pa pops the top element of stack b and pushes it onto stack a.
-// Does nothing if b is empty.
+// No-op if b is empty.
+//
+// Parameters:
+//   - a: destination stack.
+//   - b: source stack.
 func Pa(a, b *stack.Stack) {
 	val, ok := b.Pop()
 	if !ok {
@@ -49,7 +63,11 @@ func Pa(a, b *stack.Stack) {
 }
 
 // Pb pops the top element of stack a and pushes it onto stack b.
-// Does nothing if a is empty.
+// No-op if a is empty.
+//
+// Parameters:
+//   - a: source stack.
+//   - b: destination stack.
 func Pb(a, b *stack.Stack) {
 	val, ok := a.Pop()
 	if !ok {
@@ -59,7 +77,10 @@ func Pb(a, b *stack.Stack) {
 }
 
 // Ra rotates stack a upward: the top element becomes the bottom.
-// Does nothing if a has fewer than two elements.
+// No-op if a has fewer than two elements.
+//
+// Parameters:
+//   - a: the stack to rotate.
 func Ra(a *stack.Stack) {
 	if a.Len() < 2 {
 		return
@@ -68,7 +89,6 @@ func Ra(a *stack.Stack) {
 	for a.Len() > 0 {
 		a.Pop()
 	}
-	// push in reverse order with vals[0] at the bottom
 	a.Push(vals[0])
 	for i := len(vals) - 1; i >= 1; i-- {
 		a.Push(vals[i])
@@ -76,7 +96,10 @@ func Ra(a *stack.Stack) {
 }
 
 // Rb rotates stack b upward: the top element becomes the bottom.
-// Does nothing if b has fewer than two elements.
+// No-op if b has fewer than two elements.
+//
+// Parameters:
+//   - b: the stack to rotate.
 func Rb(b *stack.Stack) {
 	if b.Len() < 2 {
 		return
@@ -92,13 +115,20 @@ func Rb(b *stack.Stack) {
 }
 
 // Rr executes Ra and Rb simultaneously.
+//
+// Parameters:
+//   - a: stack a to rotate.
+//   - b: stack b to rotate.
 func Rr(a, b *stack.Stack) {
 	Ra(a)
 	Rb(b)
 }
 
 // Rra reverse-rotates stack a: the bottom element becomes the top.
-// Does nothing if a has fewer than two elements.
+// No-op if a has fewer than two elements.
+//
+// Parameters:
+//   - a: the stack to reverse-rotate.
 func Rra(a *stack.Stack) {
 	if a.Len() < 2 {
 		return
@@ -115,7 +145,10 @@ func Rra(a *stack.Stack) {
 }
 
 // Rrb reverse-rotates stack b: the bottom element becomes the top.
-// Does nothing if b has fewer than two elements.
+// No-op if b has fewer than two elements.
+//
+// Parameters:
+//   - b: the stack to reverse-rotate.
 func Rrb(b *stack.Stack) {
 	if b.Len() < 2 {
 		return
@@ -132,14 +165,24 @@ func Rrb(b *stack.Stack) {
 }
 
 // Rrr executes Rra and Rrb simultaneously.
+//
+// Parameters:
+//   - a: stack a to reverse-rotate.
+//   - b: stack b to reverse-rotate.
 func Rrr(a, b *stack.Stack) {
 	Rra(a)
 	Rrb(b)
 }
 
 // Execute applies the named operation to stacks a and b.
-// Returns true if the operation name was recognised, false otherwise.
 // Used by checker to validate and apply each instruction from stdin.
+//
+// Parameters:
+//   - op: the operation name (e.g. "sa", "pb", "rrr").
+//   - a: stack a.
+//   - b: stack b.
+//
+// Returns true if the operation name was recognized, false otherwise.
 func Execute(op string, a, b *stack.Stack) bool {
 	switch op {
 	case "sa":

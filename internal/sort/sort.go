@@ -16,6 +16,12 @@ import (
 
 // Sort sorts stack a using stack b as auxiliary storage.
 // Each operation name is written to w as it is executed.
+//
+// Parameters:
+//   - a: the primary stack to sort in ascending order.
+//   - b: the auxiliary stack, must be empty on entry.
+//   - w: writer for operation names (one per line).
+//
 // Returns the number of operations performed.
 func Sort(a, b *stack.Stack, w io.Writer) int {
 	ops := SortCollect(a, b)
@@ -27,6 +33,12 @@ func Sort(a, b *stack.Stack, w io.Writer) int {
 
 // SortCollect sorts stack a using stack b and returns the operation names.
 // Used by tests to verify both correctness and operation count.
+//
+// Parameters:
+//   - a: the primary stack to sort in ascending order.
+//   - b: the auxiliary stack, must be empty on entry.
+//
+// Returns the slice of operation names executed, or nil if already sorted.
 func SortCollect(a, b *stack.Stack) []string {
 	switch a.Len() {
 	case 0, 1:

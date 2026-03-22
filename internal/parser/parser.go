@@ -10,16 +10,18 @@ import (
 	"strings"
 )
 
-// ErrInvalidInput is returned when the provided arguments are not valid push-swap numbers.
-//
-// This covers bad tokens (like "one"), duplicates, sign-only values, and numbers
-// outside int boundaries.
+// ErrInvalidInput is returned when the provided arguments are not valid push-swap
+// numbers — bad tokens, duplicates, sign-only values, or overflow.
 var ErrInvalidInput = errors.New("invalid input")
 
 // ParseArgs converts raw CLI args into a validated integer slice.
+// Supports both quoted input ("1 2 3") and split input ("1", "2", "3"), including mixed forms.
 //
-// It supports both quoted input ("1 2 3") and split input (1 2 3), including mixed forms.
-// Empty input returns an empty slice with no error.
+// Parameters:
+//   - args: os.Args[1:] from the command line.
+//
+// Returns the parsed integers and nil on success, or nil and ErrInvalidInput
+// on bad tokens, duplicates, or overflow. Empty input returns ([]int{}, nil).
 func ParseArgs(args []string) ([]int, error) {
 	tokens := splitArgs(args)
 	if len(tokens) == 0 {
@@ -31,8 +33,6 @@ func ParseArgs(args []string) ([]int, error) {
 
 	for _, tok := range tokens {
 		if tok == "" {
-			// strings.Fields already removes empty pieces, but we keep this guard
-			// for defensive parsing.
 			continue
 		}
 
@@ -52,23 +52,29 @@ func ParseArgs(args []string) ([]int, error) {
 	return out, nil
 }
 
-// splitArgs flattens CLI args into numeric tokens.
+// splitArgs flattens CLI args into individual numeric tokens.
 //
-// Each incoming argument may contain one value or many values separated by spaces.
+// Parameters:
+//   - args: raw CLI arguments, each possibly containing space-separated values.
+//
+// Returns a flat slice of individual token strings.
 func splitArgs(args []string) []string {
 	var tokens []string
 	for _, a := range args {
-		parts := strings.Fields(a) // splits on any whitespace, ignores repeats
+		parts := strings.Fields(a)
 		tokens = append(tokens, parts...)
 	}
 	return tokens
 }
 
-// parseInt parses a single token as base-10 int.
+// parseInt parses a single token as a base-10 integer.
+// Rejects sign-only values ("+", "-"), non-numeric tokens, and values outside int range.
 //
-// It rejects sign-only values, non-integers, and out-of-range numbers.
+// Parameters:
+//   - tok: a single whitespace-free token string.
+//
+// Returns the parsed int64 value, or an error if the token is invalid.
 func parseInt(tok string) (int64, error) {
-	// ParseInt with bitSize=64 allows full parsing first; int bounds are checked below.
 	if tok == "+" || tok == "-" {
 		return 0, errors.New("sign only")
 	}

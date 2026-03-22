@@ -9,6 +9,13 @@ import (
 )
 
 // sortSmall sorts stack a when it contains between 4 and 6 elements.
+// Dispatches to sortFourFive or sortSix based on a.Len().
+//
+// Parameters:
+//   - a: the primary stack to sort.
+//   - b: the auxiliary stack, must be empty on entry.
+//
+// Returns the operation names executed, or nil if already sorted.
 func sortSmall(a, b *stack.Stack) []string {
 	if a.IsSorted() {
 		return nil
@@ -20,7 +27,14 @@ func sortSmall(a, b *stack.Stack) []string {
 }
 
 // sortFourFive handles n=4 and n=5.
-// Push minimums to b until 3 remain, sort those 3, pull back.
+// Pushes the minimum element to b repeatedly until 3 remain,
+// sorts those 3 with sortTiny, then pulls all elements back from b.
+//
+// Parameters:
+//   - a: the primary stack (4 or 5 elements).
+//   - b: the auxiliary stack, must be empty on entry.
+//
+// Returns the operation names executed.
 func sortFourFive(a, b *stack.Stack) []string {
 	var ops []string
 
@@ -62,8 +76,8 @@ func sortFourFive(a, b *stack.Stack) []string {
 
 // bfsState represents the state of both stacks during BFS exploration.
 type bfsState struct {
-	av []int // stack a values (top first)
-	bv []int // stack b values (top first)
+	av []int
+	bv []int
 }
 
 // bfsEntry is a BFS queue element holding the state and the ops taken to reach it.
@@ -73,11 +87,16 @@ type bfsEntry struct {
 }
 
 // sortSix uses BFS to find the shortest sequence of operations to sort 6 elements.
-// The input is normalised to ranks 0-5 so the BFS explores a bounded state space.
+// The input is normalized to ranks 0-5 so the BFS explores a bounded state space.
 // Since 6! = 720 permutations and the maximum optimal depth is 10, BFS terminates
 // quickly (typically under 5000 visited states).
+//
+// Parameters:
+//   - a: the primary stack (exactly 6 elements).
+//   - b: the auxiliary stack, must be empty on entry.
+//
+// Returns the shortest operation sequence found, or nil if already sorted.
 func sortSix(a, b *stack.Stack) []string {
-	// Normalise the input to ranks 0..5.
 	av := a.Values()
 	sorted := make([]int, len(av))
 	copy(sorted, av)
@@ -105,7 +124,6 @@ func sortSix(a, b *stack.Stack) []string {
 		cur := queue[0]
 		queue = queue[1:]
 
-		// Maximum depth 12 is sufficient for any 6-element permutation (worst case is 10).
 		if len(cur.ops) >= 12 {
 			continue
 		}
@@ -129,7 +147,6 @@ func sortSix(a, b *stack.Stack) []string {
 		}
 	}
 
-	// Unreachable for valid 6-element input.
 	return nil
 }
 
@@ -137,11 +154,21 @@ func sortSix(a, b *stack.Stack) []string {
 var bfsOpNames = [11]string{"sa", "sb", "ss", "pa", "pb", "ra", "rb", "rr", "rra", "rrb", "rrr"}
 
 // bfsKey encodes a BFS state as a unique string for the visited map.
+//
+// Parameters:
+//   - s: the state to encode.
+//
+// Returns a string key suitable for map lookups.
 func bfsKey(s bfsState) string {
 	return fmt.Sprintf("%v|%v", s.av, s.bv)
 }
 
-// bfsIsSorted reports whether stack a is sorted ascending and stack b is empty.
+// bfsIsSorted reports whether a is sorted ascending and b is empty.
+//
+// Parameters:
+//   - s: the state to check.
+//
+// Returns true if the state represents a fully sorted result.
 func bfsIsSorted(s bfsState) bool {
 	if len(s.bv) != 0 {
 		return false
@@ -155,7 +182,13 @@ func bfsIsSorted(s bfsState) bool {
 }
 
 // bfsApplyOp returns the new state after applying a single operation.
-// All slices are freshly allocated to avoid aliasing.
+// All slices are freshly allocated to avoid aliasing between states.
+//
+// Parameters:
+//   - s: the current state.
+//   - op: the operation name to apply.
+//
+// Returns the new state after the operation.
 func bfsApplyOp(s bfsState, op string) bfsState {
 	av := make([]int, len(s.av))
 	copy(av, s.av)
@@ -233,6 +266,11 @@ func bfsApplyOp(s bfsState, op string) bfsState {
 }
 
 // bfsRotate returns a new slice with the first element moved to the end.
+//
+// Parameters:
+//   - s: the input slice (len >= 2).
+//
+// Returns a newly allocated rotated slice.
 func bfsRotate(s []int) []int {
 	n := make([]int, len(s))
 	copy(n, s[1:])
@@ -241,6 +279,11 @@ func bfsRotate(s []int) []int {
 }
 
 // bfsReverseRotate returns a new slice with the last element moved to the front.
+//
+// Parameters:
+//   - s: the input slice (len >= 2).
+//
+// Returns a newly allocated reverse-rotated slice.
 func bfsReverseRotate(s []int) []int {
 	n := make([]int, len(s))
 	n[0] = s[len(s)-1]
@@ -249,6 +292,11 @@ func bfsReverseRotate(s []int) []int {
 }
 
 // replayOps applies a slice of op names to the real stacks.
+//
+// Parameters:
+//   - a: stack a.
+//   - b: stack b.
+//   - ops: the operation names to execute in order.
 func replayOps(a, b *stack.Stack, ops []string) {
 	for _, op := range ops {
 		switch op {
