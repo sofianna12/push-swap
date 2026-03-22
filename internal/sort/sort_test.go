@@ -108,26 +108,33 @@ func TestSort_Five(t *testing.T) {
 	}
 }
 
-// --- n=6: all inputs must sort correctly ---
-// The official audit checks "2 1 3 6 5 8" with < 9 instructions via the binary.
-// We verify correctness here; op count for that input is checked via smoke test.
+// --- n=6: official audit input must sort in < 9 ops ---
+// The spec only mandates < 9 for the specific audit input "2 1 3 6 5 8".
+// Not all 6-element permutations are solvable in ≤8 ops; those are tested
+// with their true optimal bound.
 
 func TestSort_Six(t *testing.T) {
-	tests := [][]int{
-		{6, 5, 4, 3, 2, 1},
-		{2, 1, 3, 6, 5, 8},
-		{1, 6, 2, 5, 3, 4},
-		{4, 2, 6, 1, 5, 3},
-		{6, 1, 5, 2, 4, 3},
-		{3, 6, 1, 4, 2, 5},
-		{5, 3, 1, 6, 4, 2},
-		{2, 5, 3, 1, 6, 4},
-		{4, 1, 3, 5, 2, 6},
-		{6, 4, 2, 1, 3, 5},
+	tests := []struct {
+		nums   []int
+		maxOps int
+	}{
+		// Audit input — spec requires < 9 ops
+		{[]int{2, 1, 3, 6, 5, 8}, 8},
+		// Additional permutations solvable in ≤8 ops
+		{[]int{1, 6, 2, 5, 3, 4}, 8},
+		{[]int{6, 1, 5, 2, 4, 3}, 8},
+		{[]int{3, 6, 1, 4, 2, 5}, 8},
+		{[]int{5, 3, 1, 6, 4, 2}, 8},
+		{[]int{2, 5, 3, 1, 6, 4}, 8},
+		{[]int{4, 1, 3, 5, 2, 6}, 8},
+		{[]int{6, 4, 2, 1, 3, 5}, 8},
+		// Permutations whose optimal solution exceeds 8 — tested for correctness only
+		{[]int{6, 5, 4, 3, 2, 1}, 10}, // optimal is 10
+		{[]int{4, 2, 6, 1, 5, 3}, 9},  // optimal is 9
 	}
-	for _, nums := range tests {
-		t.Run(fmt.Sprintf("%v", nums), func(t *testing.T) {
-			requireSorted(t, nums, -1)
+	for _, tt := range tests {
+		t.Run(fmt.Sprintf("%v", tt.nums), func(t *testing.T) {
+			requireSorted(t, tt.nums, tt.maxOps)
 		})
 	}
 }
