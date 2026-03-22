@@ -1,3 +1,6 @@
+// Package parser provides argument parsing and validation for push-swap and checker.
+// It converts raw CLI arguments into a validated slice of integers, rejecting
+// non-integer tokens, duplicates, and values outside the int range.
 package parser
 
 import (
