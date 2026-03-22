@@ -29,10 +29,24 @@ func TestSa(t *testing.T) {
 }
 
 func TestSb(t *testing.T) {
-	b := stack.New("b", []int{3, 4, 5})
-	Sb(b)
-	if got := b.Values(); !equalSlice(got, []int{4, 3, 5}) {
-		t.Fatalf("Sb([3 4 5]) = %v, want [4 3 5]", got)
+	tests := []struct {
+		name string
+		in   []int
+		want []int
+	}{
+		{"swap three", []int{3, 4, 5}, []int{4, 3, 5}},
+		{"swap two", []int{1, 2}, []int{2, 1}},
+		{"single no-op", []int{5}, []int{5}},
+		{"empty no-op", []int{}, []int{}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			b := stack.New("b", tt.in)
+			Sb(b)
+			if got := b.Values(); !equalSlice(got, tt.want) {
+				t.Fatalf("Sb(%v) = %v, want %v", tt.in, got, tt.want)
+			}
+		})
 	}
 }
 
@@ -111,10 +125,24 @@ func TestRa(t *testing.T) {
 }
 
 func TestRb(t *testing.T) {
-	b := stack.New("b", []int{1, 2, 3})
-	Rb(b)
-	if got := b.Values(); !equalSlice(got, []int{2, 3, 1}) {
-		t.Fatalf("Rb([1 2 3]) = %v, want [2 3 1]", got)
+	tests := []struct {
+		name string
+		in   []int
+		want []int
+	}{
+		{"three elements", []int{1, 2, 3}, []int{2, 3, 1}},
+		{"two elements", []int{1, 2}, []int{2, 1}},
+		{"single no-op", []int{5}, []int{5}},
+		{"empty no-op", []int{}, []int{}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			b := stack.New("b", tt.in)
+			Rb(b)
+			if got := b.Values(); !equalSlice(got, tt.want) {
+				t.Fatalf("Rb(%v) = %v, want %v", tt.in, got, tt.want)
+			}
+		})
 	}
 }
 
@@ -153,10 +181,24 @@ func TestRra(t *testing.T) {
 }
 
 func TestRrb(t *testing.T) {
-	b := stack.New("b", []int{1, 2, 3})
-	Rrb(b)
-	if got := b.Values(); !equalSlice(got, []int{3, 1, 2}) {
-		t.Fatalf("Rrb([1 2 3]) = %v, want [3 1 2]", got)
+	tests := []struct {
+		name string
+		in   []int
+		want []int
+	}{
+		{"three elements", []int{1, 2, 3}, []int{3, 1, 2}},
+		{"two elements", []int{1, 2}, []int{2, 1}},
+		{"single no-op", []int{5}, []int{5}},
+		{"empty no-op", []int{}, []int{}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			b := stack.New("b", tt.in)
+			Rrb(b)
+			if got := b.Values(); !equalSlice(got, tt.want) {
+				t.Fatalf("Rrb(%v) = %v, want %v", tt.in, got, tt.want)
+			}
+		})
 	}
 }
 
