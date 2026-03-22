@@ -1,3 +1,6 @@
+// Package main implements the checker binary.
+// It reads integers from command-line arguments, executes push-swap instructions
+// from stdin, and prints OK if the result is sorted or KO otherwise.
 package main
 
 import (
