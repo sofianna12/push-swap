@@ -1,0 +1,54 @@
+name: Deploy
+
+# Manual trigger only — not wired to any automatic event.
+# To use: GitHub → Actions → Deploy → Run workflow
+# Adapt this to your target environment (SSH, cloud provider, etc.)
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Run tests
+        run: go test -race ./...
+
+      - name: Build binaries
+        run: |
+          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o push-swap ./cmd/push-swap
+          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o checker ./cmd/checker
+
+      # Adapt the step below to your deployment method
+      # Example: copy binaries to a remote server via SSH
+      # - name: Deploy via SSH
+      #   uses: appleboy/ssh-action@v1
+      #   with:
+      #     host: ${{ secrets.DEPLOY_HOST }}
+      #     username: ${{ secrets.DEPLOY_USER }}
+      #     key: ${{ secrets.DEPLOY_KEY }}
+      #     script: |
+      #       systemctl stop push-swap || true
+      #       cp push-swap /usr/local/bin/push-swap
+      #       systemctl start push-swap
+
+      - name: Placeholder
+        run: echo "Deployment to ${{ inputs.environment }} — configure the SSH/cloud step above"

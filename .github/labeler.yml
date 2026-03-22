@@ -1,0 +1,24 @@
+stack:
+  - internal/stack/**
+
+ops:
+  - internal/operations/**
+
+sort:
+  - internal/sort/**
+
+parser:
+  - internal/parser/**
+
+push-swap:
+  - cmd/push-swap/**
+
+checker:
+  - cmd/checker/**
+
+ci:
+  - .github/**
+
+docs:
+  - "*.md"
+  - Makefile

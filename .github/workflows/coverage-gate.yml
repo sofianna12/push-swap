@@ -1,0 +1,32 @@
+name: Coverage Gate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Run tests with coverage
+        run: go test -race -coverprofile=coverage.out -covermode=atomic ./...
+
+      - name: Check overall coverage threshold
+        run: |
+          COVERAGE=$(go tool cover -func=coverage.out | grep total | awk '{print $3}' | tr -d '%')
+          echo "Overall coverage: ${COVERAGE}%"
+          # Fail if below 85%
+          awk -v cov="$COVERAGE" 'BEGIN { if (cov + 0 < 85) { print "FAIL: coverage " cov "% is below 85% threshold"; exit 1 } else { print "PASS: coverage " cov "%" } }'
+
+      - name: Per-package coverage report
+        run: go tool cover -func=coverage.out

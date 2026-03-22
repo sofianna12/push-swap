@@ -1,0 +1,72 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Run tests
+        run: go test -race ./...
+
+      - name: Build Linux binaries
+        run: |
+          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o push-swap-linux-amd64 ./cmd/push-swap
+          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o checker-linux-amd64 ./cmd/checker
+
+      - name: Build macOS binaries
+        run: |
+          CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -ldflags="-s -w" -o push-swap-darwin-amd64 ./cmd/push-swap
+          CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -ldflags="-s -w" -o checker-darwin-amd64 ./cmd/checker
+
+      - name: Build Windows binaries
+        run: |
+          CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -ldflags="-s -w" -o push-swap-windows-amd64.exe ./cmd/push-swap
+          CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -ldflags="-s -w" -o checker-windows-amd64.exe ./cmd/checker
+
+      - name: Verify operation counts
+        run: |
+          chmod +x push-swap-linux-amd64
+          MAX5=0
+          for i in $(seq 20); do
+            ARG=$(shuf -i 1-100 -n 5 | tr '\n' ' ')
+            COUNT=$(./push-swap-linux-amd64 $ARG 2>/dev/null | wc -l || echo 999)
+            [ "$COUNT" -gt "$MAX5" ] && MAX5=$COUNT
+          done
+          echo "n=5 worst case: $MAX5 ops (limit: <12)"
+          [ "$MAX5" -lt 12 ] || (echo "FAIL: n=5 exceeded 12 ops" && exit 1)
+
+          MAX100=0
+          for i in $(seq 5); do
+            ARG=$(shuf -i 1-10000 -n 100 | tr '\n' ' ')
+            COUNT=$(./push-swap-linux-amd64 $ARG 2>/dev/null | wc -l || echo 9999)
+            [ "$COUNT" -gt "$MAX100" ] && MAX100=$COUNT
+          done
+          echo "n=100 worst case: $MAX100 ops (limit: <700)"
+          [ "$MAX100" -lt 700 ] || (echo "FAIL: n=100 exceeded 700 ops" && exit 1)
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            push-swap-linux-amd64
+            checker-linux-amd64
+            push-swap-darwin-amd64
+            checker-darwin-amd64
+            push-swap-windows-amd64.exe
+            checker-windows-amd64.exe
+          generate_release_notes: true
