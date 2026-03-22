@@ -86,6 +86,24 @@ func TestSort_Three(t *testing.T) {
 	}
 }
 
+// --- n=4: correctness + op count ---
+
+func TestSort_Four(t *testing.T) {
+	tests := [][]int{
+		{4, 3, 2, 1},
+		{2, 1, 4, 3},
+		{3, 1, 2, 4},
+		{4, 2, 1, 3},
+		{1, 4, 3, 2},
+		{3, 4, 1, 2},
+	}
+	for _, nums := range tests {
+		t.Run(fmt.Sprintf("%v", nums), func(t *testing.T) {
+			requireSorted(t, nums, 11)
+		})
+	}
+}
+
 // --- n=5: must use fewer than 12 ops ---
 
 func TestSort_Five(t *testing.T) {
