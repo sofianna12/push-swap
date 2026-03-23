@@ -91,7 +91,7 @@ ARG="4 67 3 87 23"; ./push-swap "$ARG" | ./checker "$ARG"  # must be OK
 ## Opening a PR
 
 1. Push your branch: `git push origin feature/your-feature`
-2. Open a PR on GitHub: `feature/your-feature → main`
+2. Open a PR on GitHub: `feature/your-feature → develop`
 3. PR title must follow Conventional Commits format
 4. PR body must include:
    - What changed and why

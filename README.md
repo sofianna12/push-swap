@@ -97,5 +97,5 @@ go tool cover -func=coverage.out
 | Anna (`@sofianna12`) | Developer — stack, operations, small sort |
 | Alex (`@arigopou`) | Developer — parser, large sort |
 
-Branch strategy: `feature/<slug>` → PR → Theo merges to `main`.
-See [PERMISSIONS.md](PERMISSIONS.md) for the full workflow.
+Branch strategy: `feature/<slug>` → PR to `develop` → Theo merges `develop` to `main`.
+See [PERMISSIONS.md](PERMISSIONS.md) for team permissions.
