@@ -15,7 +15,7 @@ func TestMain(m *testing.M) {
 	if err != nil {
 		panic("failed to create temp dir: " + err.Error())
 	}
-	defer os.RemoveAll(bin)
+	defer os.RemoveAll(bin) //nolint:errcheck
 
 	checkerBin = bin + "/checker"
 	out, err := exec.Command("go", "build", "-o", checkerBin, ".").CombinedOutput()

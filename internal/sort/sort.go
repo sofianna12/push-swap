@@ -26,7 +26,7 @@ import (
 func Sort(a, b *stack.Stack, w io.Writer) int {
 	ops := SortCollect(a, b)
 	for _, op := range ops {
-		fmt.Fprintln(w, op)
+		fmt.Fprintln(w, op) //nolint:errcheck
 	}
 	return len(ops)
 }
