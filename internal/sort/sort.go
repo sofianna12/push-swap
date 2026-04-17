@@ -2,8 +2,9 @@
 //
 // Sort dispatches to the optimal algorithm based on stack size:
 //   - n=0,1: nothing
-//   - n=2,3: sortTiny (hardcoded, at most 2 ops)
-//   - n=4,5,6: sortSmall (push minimum to b, sort remaining 3, pull back)
+//   - n=2,3: sortTiny (hardcoded decision tree, at most 2 ops)
+//   - n=4,5: sortFourFive (push minimum to b, sort remaining 3, pull back)
+//   - n=6: sortSix (BFS over all permutations, guaranteed shortest sequence)
 //   - n>6: sortLarge (Turkish rank-based chunking algorithm)
 package sort
 
@@ -15,7 +16,7 @@ import (
 )
 
 // Sort sorts stack a using stack b as auxiliary storage.
-// Each operation name is written to w as it is executed.
+// Operation names are written to w one per line after sorting completes.
 //
 // Parameters:
 //   - a: the primary stack to sort in ascending order.

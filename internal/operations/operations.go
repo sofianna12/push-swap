@@ -13,6 +13,8 @@ import "push-swap/internal/stack"
 //
 // Parameters:
 //   - a: the stack to swap on.
+//
+// Returns nothing.
 func Sa(a *stack.Stack) {
 	if a.Len() < 2 {
 		return
@@ -28,6 +30,8 @@ func Sa(a *stack.Stack) {
 //
 // Parameters:
 //   - b: the stack to swap on.
+//
+// Returns nothing.
 func Sb(b *stack.Stack) {
 	if b.Len() < 2 {
 		return
@@ -43,6 +47,8 @@ func Sb(b *stack.Stack) {
 // Parameters:
 //   - a: stack a to swap on.
 //   - b: stack b to swap on.
+//
+// Returns nothing.
 func Ss(a, b *stack.Stack) {
 	Sa(a)
 	Sb(b)
@@ -54,6 +60,8 @@ func Ss(a, b *stack.Stack) {
 // Parameters:
 //   - a: destination stack.
 //   - b: source stack.
+//
+// Returns nothing.
 func Pa(a, b *stack.Stack) {
 	val, ok := b.Pop()
 	if !ok {
@@ -68,6 +76,8 @@ func Pa(a, b *stack.Stack) {
 // Parameters:
 //   - a: source stack.
 //   - b: destination stack.
+//
+// Returns nothing.
 func Pb(a, b *stack.Stack) {
 	val, ok := a.Pop()
 	if !ok {
@@ -81,6 +91,8 @@ func Pb(a, b *stack.Stack) {
 //
 // Parameters:
 //   - a: the stack to rotate.
+//
+// Returns nothing.
 func Ra(a *stack.Stack) {
 	if a.Len() < 2 {
 		return
@@ -100,6 +112,8 @@ func Ra(a *stack.Stack) {
 //
 // Parameters:
 //   - b: the stack to rotate.
+//
+// Returns nothing.
 func Rb(b *stack.Stack) {
 	if b.Len() < 2 {
 		return
@@ -119,6 +133,8 @@ func Rb(b *stack.Stack) {
 // Parameters:
 //   - a: stack a to rotate.
 //   - b: stack b to rotate.
+//
+// Returns nothing.
 func Rr(a, b *stack.Stack) {
 	Ra(a)
 	Rb(b)
@@ -129,6 +145,8 @@ func Rr(a, b *stack.Stack) {
 //
 // Parameters:
 //   - a: the stack to reverse-rotate.
+//
+// Returns nothing.
 func Rra(a *stack.Stack) {
 	if a.Len() < 2 {
 		return
@@ -149,6 +167,8 @@ func Rra(a *stack.Stack) {
 //
 // Parameters:
 //   - b: the stack to reverse-rotate.
+//
+// Returns nothing.
 func Rrb(b *stack.Stack) {
 	if b.Len() < 2 {
 		return
@@ -169,6 +189,8 @@ func Rrb(b *stack.Stack) {
 // Parameters:
 //   - a: stack a to reverse-rotate.
 //   - b: stack b to reverse-rotate.
+//
+// Returns nothing.
 func Rrr(a, b *stack.Stack) {
 	Rra(a)
 	Rrb(b)

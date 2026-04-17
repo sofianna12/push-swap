@@ -10,7 +10,7 @@ import (
 // Parameters:
 //   - a: the stack to sort (must have 2 or 3 elements).
 //
-// Returns the operation names executed, or nil if already sorted.
+// Returns the operation names executed as a []string, or nil if already sorted.
 func sortTiny(a *stack.Stack) []string {
 	switch a.Len() {
 	case 2:
@@ -26,7 +26,7 @@ func sortTiny(a *stack.Stack) []string {
 // Parameters:
 //   - a: the stack to sort (must have exactly 2 elements).
 //
-// Returns the operation names executed, or nil if already sorted.
+// Returns the operation names executed as a []string, or nil if already sorted.
 func sortTwo(a *stack.Stack) []string {
 	vals := a.Values()
 	if vals[0] > vals[1] {
@@ -41,7 +41,7 @@ func sortTwo(a *stack.Stack) []string {
 // Parameters:
 //   - a: the stack to sort (must have exactly 3 elements).
 //
-// Returns the operation names executed, or nil if already sorted.
+// Returns the operation names executed as a []string, or nil if already sorted.
 func sortThree(a *stack.Stack) []string {
 	var ops []string
 	v := a.Values()

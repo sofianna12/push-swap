@@ -17,7 +17,7 @@ import (
 //   - a: the primary stack (more than 6 elements).
 //   - b: the auxiliary stack, must be empty on entry.
 //
-// Returns the operation names executed, or nil if already sorted.
+// Returns the operation names executed as a []string, or nil if already sorted.
 func sortLarge(a, b *stack.Stack) []string {
 	vals := a.Values()
 	if len(vals) <= 1 || a.IsSorted() {
@@ -100,7 +100,7 @@ func sortLarge(a, b *stack.Stack) []string {
 // Parameters:
 //   - vals: the original stack values.
 //
-// Returns a map from value to rank (0-indexed).
+// Returns a map[int]int from value to 0-indexed rank.
 func buildRank(vals []int) map[int]int {
 	cp := append([]int(nil), vals...)
 	sort.Ints(cp)
@@ -116,9 +116,9 @@ func buildRank(vals []int) map[int]int {
 // Parameters:
 //   - a: the stack to scan.
 //   - rank: value-to-rank mapping.
-//   - lo, hi: inclusive lower and exclusive upper rank bounds.
+//   - lo, hi: inclusive lower bound and exclusive upper bound on rank.
 //
-// Returns the count of matching elements.
+// Returns the count of elements whose rank falls in [lo, hi).
 func countInWindow(a *stack.Stack, rank map[int]int, lo, hi int) int {
 	c := 0
 	for _, v := range a.Values() {
@@ -135,9 +135,9 @@ func countInWindow(a *stack.Stack, rank map[int]int, lo, hi int) int {
 // Parameters:
 //   - a: the stack to scan.
 //   - rank: value-to-rank mapping.
-//   - lo, hi: inclusive lower and exclusive upper rank bounds.
+//   - lo, hi: inclusive lower bound and exclusive upper bound on rank.
 //
-// Returns (up, down): rotations via ra and rra respectively.
+// Returns (up, down): up is the number of ra rotations, down is the number of rra rotations.
 func distanceToWindow(a *stack.Stack, rank map[int]int, lo, hi int) (up int, down int) {
 	vals := a.Values()
 	n := len(vals)
@@ -171,7 +171,7 @@ func distanceToWindow(a *stack.Stack, rank map[int]int, lo, hi int) (up int, dow
 //   - b: the stack to scan.
 //   - rank: value-to-rank mapping.
 //
-// Returns (up, down): rotations via rb and rrb respectively.
+// Returns (up, down): up is the number of rb rotations, down is the number of rrb rotations.
 func distanceToMax(b *stack.Stack, rank map[int]int) (up int, down int) {
 	vals := b.Values()
 	n := len(vals)

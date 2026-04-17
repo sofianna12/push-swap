@@ -9,13 +9,13 @@ import (
 )
 
 // sortSmall sorts stack a when it contains between 4 and 6 elements.
-// Dispatches to sortFourFive or sortSix based on a.Len().
+// Dispatches to sortFourFive for n=4,5 and sortSix for n=6.
 //
 // Parameters:
 //   - a: the primary stack to sort.
 //   - b: the auxiliary stack, must be empty on entry.
 //
-// Returns the operation names executed, or nil if already sorted.
+// Returns the operation names executed as a []string, or nil if already sorted.
 func sortSmall(a, b *stack.Stack) []string {
 	if a.IsSorted() {
 		return nil
@@ -34,7 +34,7 @@ func sortSmall(a, b *stack.Stack) []string {
 //   - a: the primary stack (4 or 5 elements).
 //   - b: the auxiliary stack, must be empty on entry.
 //
-// Returns the operation names executed.
+// Returns the operation names executed as a []string.
 func sortFourFive(a, b *stack.Stack) []string {
 	var ops []string
 
@@ -95,7 +95,7 @@ type bfsEntry struct {
 //   - a: the primary stack (exactly 6 elements).
 //   - b: the auxiliary stack, must be empty on entry.
 //
-// Returns the shortest operation sequence found, or nil if already sorted.
+// Returns the shortest operation sequence as a []string, or nil if already sorted.
 func sortSix(a, b *stack.Stack) []string {
 	av := a.Values()
 	sorted := make([]int, len(av))
@@ -156,7 +156,7 @@ var bfsOpNames = [11]string{"sa", "sb", "ss", "pa", "pb", "ra", "rb", "rr", "rra
 // bfsKey encodes a BFS state as a unique string for the visited map.
 //
 // Parameters:
-//   - s: the state to encode.
+//   - s: the BFS state to encode.
 //
 // Returns a string key suitable for map lookups.
 func bfsKey(s bfsState) string {
@@ -166,9 +166,9 @@ func bfsKey(s bfsState) string {
 // bfsIsSorted reports whether a is sorted ascending and b is empty.
 //
 // Parameters:
-//   - s: the state to check.
+//   - s: the BFS state to check.
 //
-// Returns true if the state represents a fully sorted result.
+// Returns true if stack a is sorted ascending and stack b is empty.
 func bfsIsSorted(s bfsState) bool {
 	if len(s.bv) != 0 {
 		return false
@@ -185,10 +185,10 @@ func bfsIsSorted(s bfsState) bool {
 // All slices are freshly allocated to avoid aliasing between states.
 //
 // Parameters:
-//   - s: the current state.
-//   - op: the operation name to apply.
+//   - s: the current BFS state.
+//   - op: the operation name to apply (e.g. "sa", "pb", "rrr").
 //
-// Returns the new state after the operation.
+// Returns a new bfsState with the operation applied.
 func bfsApplyOp(s bfsState, op string) bfsState {
 	av := make([]int, len(s.av))
 	copy(av, s.av)
@@ -270,7 +270,7 @@ func bfsApplyOp(s bfsState, op string) bfsState {
 // Parameters:
 //   - s: the input slice (len >= 2).
 //
-// Returns a newly allocated rotated slice.
+// Returns a newly allocated []int with the first element moved to the end.
 func bfsRotate(s []int) []int {
 	n := make([]int, len(s))
 	copy(n, s[1:])
@@ -283,7 +283,7 @@ func bfsRotate(s []int) []int {
 // Parameters:
 //   - s: the input slice (len >= 2).
 //
-// Returns a newly allocated reverse-rotated slice.
+// Returns a newly allocated []int with the last element moved to the front.
 func bfsReverseRotate(s []int) []int {
 	n := make([]int, len(s))
 	n[0] = s[len(s)-1]
@@ -294,9 +294,11 @@ func bfsReverseRotate(s []int) []int {
 // replayOps applies a slice of op names to the real stacks.
 //
 // Parameters:
-//   - a: stack a.
-//   - b: stack b.
+//   - a: the primary stack.
+//   - b: the auxiliary stack.
 //   - ops: the operation names to execute in order.
+//
+// Returns nothing.
 func replayOps(a, b *stack.Stack, ops []string) {
 	for _, op := range ops {
 		switch op {

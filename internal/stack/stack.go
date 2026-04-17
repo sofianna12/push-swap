@@ -3,12 +3,11 @@
 // The Stack represents a LIFO (Last-In, First-Out) collection of integers
 // where index 0 corresponds to the top of the stack.
 //
-// All methods that modify the stack operate on pointer receivers.
+// All methods use pointer receivers.
 package stack
 
 // Stack represents a LIFO collection of integers.
 // The element at index 0 is considered the top of the stack.
-// name is "a" or "b" and is used for debugging only — it never appears in output.
 type Stack struct {
 	data []int
 	name string
@@ -32,6 +31,8 @@ func New(name string, nums []int) *Stack {
 //
 // Parameters:
 //   - v: the integer to push onto the top.
+//
+// Returns nothing.
 func (s *Stack) Push(v int) {
 	s.data = append([]int{v}, s.data...)
 }
@@ -65,6 +66,8 @@ func (s *Stack) Peek() (int, bool) {
 }
 
 // Len returns the number of elements currently in the stack.
+//
+// Returns the element count as an int.
 func (s *Stack) Len() int {
 	return len(s.data)
 }
@@ -72,6 +75,8 @@ func (s *Stack) Len() int {
 // Values returns a defensive copy of the stack contents as a slice.
 // Index 0 of the returned slice corresponds to the top of the stack.
 // Mutating the returned slice does not affect the stack.
+//
+// Returns a []int copy of the stack contents, index 0 is the top.
 func (s *Stack) Values() []int {
 	cp := make([]int, len(s.data))
 	copy(cp, s.data)
@@ -80,6 +85,8 @@ func (s *Stack) Values() []int {
 
 // IsSorted reports whether the stack is sorted in ascending order from top to bottom.
 // An empty stack or a single-element stack is always considered sorted.
+//
+// Returns true if sorted ascending, false otherwise.
 func (s *Stack) IsSorted() bool {
 	for i := 1; i < len(s.data); i++ {
 		if s.data[i-1] > s.data[i] {

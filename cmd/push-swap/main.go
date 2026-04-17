@@ -1,6 +1,6 @@
 // Package main implements the push-swap binary.
 // It reads integers from command-line arguments, validates them, and prints
-// the minimum sequence of push-swap operations to sort them onto stack a.
+// an efficient sequence of push-swap operations to sort them onto stack a.
 package main
 
 import (
