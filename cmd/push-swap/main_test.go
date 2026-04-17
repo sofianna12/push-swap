@@ -8,7 +8,6 @@ import (
 	"testing"
 )
 
-// pushSwapBin is the path to the compiled push-swap binary used by all tests.
 var pushSwapBin string
 
 func TestMain(m *testing.M) {
@@ -27,7 +26,6 @@ func TestMain(m *testing.M) {
 	os.Exit(m.Run())
 }
 
-// run executes push-swap with the given arguments and returns stdout, stderr, and exit code.
 func run(args ...string) (stdout, stderr string, exitCode int) {
 	cmd := exec.Command(pushSwapBin, args...)
 	var outBuf, errBuf strings.Builder
@@ -45,7 +43,6 @@ func run(args ...string) (stdout, stderr string, exitCode int) {
 	return
 }
 
-// countLines returns the number of non-empty lines in s.
 func countLines(s string) int {
 	n := 0
 	for _, line := range strings.Split(strings.TrimSpace(s), "\n") {
@@ -56,7 +53,6 @@ func countLines(s string) int {
 	return n
 }
 
-// TestPushSwap_NoArgs — no arguments: exit 0, no output.
 func TestPushSwap_NoArgs(t *testing.T) {
 	stdout, stderr, code := run()
 	if code != 0 {
@@ -70,7 +66,6 @@ func TestPushSwap_NoArgs(t *testing.T) {
 	}
 }
 
-// TestPushSwap_AlreadySorted — sorted input: exit 0, no output.
 func TestPushSwap_AlreadySorted(t *testing.T) {
 	stdout, _, code := run("0 1 2 3 4 5")
 	if code != 0 {
@@ -81,7 +76,6 @@ func TestPushSwap_AlreadySorted(t *testing.T) {
 	}
 }
 
-// TestPushSwap_AuditInput — "2 1 3 6 5 8" must produce < 9 instructions.
 func TestPushSwap_AuditInput(t *testing.T) {
 	stdout, _, code := run("2 1 3 6 5 8")
 	if code != 0 {
@@ -93,7 +87,6 @@ func TestPushSwap_AuditInput(t *testing.T) {
 	}
 }
 
-// TestPushSwap_FiveNumbers — 5 numbers must produce < 12 instructions.
 func TestPushSwap_FiveNumbers(t *testing.T) {
 	tests := []string{
 		"1 5 2 4 3",
@@ -114,7 +107,6 @@ func TestPushSwap_FiveNumbers(t *testing.T) {
 	}
 }
 
-// TestPushSwap_InvalidArg — non-integer: exit 1, stderr = "Error\n", stdout empty.
 func TestPushSwap_InvalidArg(t *testing.T) {
 	stdout, stderr, code := run("0 one 2 3")
 	if code != 1 {
@@ -128,7 +120,6 @@ func TestPushSwap_InvalidArg(t *testing.T) {
 	}
 }
 
-// TestPushSwap_Duplicates — duplicate integers: exit 1, stderr = "Error\n".
 func TestPushSwap_Duplicates(t *testing.T) {
 	stdout, stderr, code := run("1 2 2 3")
 	if code != 1 {
@@ -142,9 +133,7 @@ func TestPushSwap_Duplicates(t *testing.T) {
 	}
 }
 
-// TestPushSwap_100Numbers — 100 numbers: < 700 ops.
 func TestPushSwap_100Numbers(t *testing.T) {
-	// Fixed permutation for reproducibility
 	nums := make([]string, 100)
 	perm := deterministicPerm(100)
 	for i, v := range perm {
@@ -162,13 +151,11 @@ func TestPushSwap_100Numbers(t *testing.T) {
 	}
 }
 
-// deterministicPerm returns a fixed pseudo-random permutation of 0..n-1.
 func deterministicPerm(n int) []int {
 	perm := make([]int, n)
 	for i := range perm {
 		perm[i] = i + 1
 	}
-	// Fisher-Yates with fixed seed
 	seed := uint64(12345)
 	next := func() uint64 {
 		seed ^= seed << 13

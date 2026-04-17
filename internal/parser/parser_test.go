@@ -6,7 +6,6 @@ import (
 	"testing"
 )
 
-// TestParseArgs_OK checks the most common valid input shapes we expect from CLI usage.
 func TestParseArgs_OK(t *testing.T) {
 	tests := []struct {
 		name string
@@ -42,7 +41,6 @@ func TestParseArgs_OK(t *testing.T) {
 	}
 }
 
-// TestParseArgs_Invalid checks malformed input and duplicate handling.
 func TestParseArgs_Invalid(t *testing.T) {
 	tests := []struct {
 		name string

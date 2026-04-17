@@ -7,7 +7,6 @@ import (
 	"testing"
 )
 
-// checkerBin is the path to the compiled checker binary used by all tests.
 var checkerBin string
 
 func TestMain(m *testing.M) {
@@ -26,7 +25,6 @@ func TestMain(m *testing.M) {
 	os.Exit(m.Run())
 }
 
-// runChecker executes checker with the given arguments and stdin, returns stdout, stderr, exit code.
 func runChecker(stdin string, args ...string) (stdout, stderr string, exitCode int) {
 	cmd := exec.Command(checkerBin, args...)
 	cmd.Stdin = strings.NewReader(stdin)
@@ -45,7 +43,6 @@ func runChecker(stdin string, args ...string) (stdout, stderr string, exitCode i
 	return
 }
 
-// TestChecker_NoArgs — no arguments: exit 0, no output.
 func TestChecker_NoArgs(t *testing.T) {
 	stdout, stderr, code := runChecker("")
 	if code != 0 {
@@ -59,7 +56,6 @@ func TestChecker_NoArgs(t *testing.T) {
 	}
 }
 
-// TestChecker_InvalidArg — non-integer argument: exit 1, stderr = "Error\n".
 func TestChecker_InvalidArg(t *testing.T) {
 	stdout, stderr, code := runChecker("", "0 one 2 3")
 	if code != 1 {
@@ -73,9 +69,7 @@ func TestChecker_InvalidArg(t *testing.T) {
 	}
 }
 
-// TestChecker_OK — valid instructions that sort the stack: stdout = "OK\n".
 func TestChecker_OK(t *testing.T) {
-	// echo -e "pb\nra\npb\nra\nsa\nra\npa\npa\n" | ./checker "0 9 1 8 2"
 	stdin := "pb\nra\npb\nra\nsa\nra\npa\npa\n"
 	stdout, _, code := runChecker(stdin, "0 9 1 8 2")
 	if code != 0 {
@@ -86,9 +80,7 @@ func TestChecker_OK(t *testing.T) {
 	}
 }
 
-// TestChecker_KO — valid instructions that do not sort the stack: stdout = "KO\n".
 func TestChecker_KO(t *testing.T) {
-	// echo -e "sa\npb\nrrr\n" | ./checker "0 9 1 8 2 7 3 6 4 5"
 	stdin := "sa\npb\nrrr\n"
 	stdout, _, code := runChecker(stdin, "0 9 1 8 2 7 3 6 4 5")
 	if code != 0 {
@@ -99,7 +91,6 @@ func TestChecker_KO(t *testing.T) {
 	}
 }
 
-// TestChecker_UnknownInstruction — invalid instruction: exit 1, stderr = "Error\n".
 func TestChecker_UnknownInstruction(t *testing.T) {
 	stdout, stderr, code := runChecker("sa\nXX\n", "1 2 3")
 	if code != 1 {
@@ -113,7 +104,6 @@ func TestChecker_UnknownInstruction(t *testing.T) {
 	}
 }
 
-// TestChecker_AlreadySortedNoOps — sorted stack, no instructions: stdout = "OK\n".
 func TestChecker_AlreadySortedNoOps(t *testing.T) {
 	stdout, _, code := runChecker("", "1 2 3 4 5")
 	if code != 0 {
@@ -124,7 +114,6 @@ func TestChecker_AlreadySortedNoOps(t *testing.T) {
 	}
 }
 
-// TestChecker_UnsortedNoOps — unsorted stack, no instructions: stdout = "KO\n".
 func TestChecker_UnsortedNoOps(t *testing.T) {
 	stdout, _, code := runChecker("", "3 2 1")
 	if code != 0 {
@@ -135,7 +124,6 @@ func TestChecker_UnsortedNoOps(t *testing.T) {
 	}
 }
 
-// TestChecker_EmptyLines — empty lines in stdin are silently skipped.
 func TestChecker_EmptyLines(t *testing.T) {
 	stdin := "\nsa\n\n"
 	stdout, _, code := runChecker(stdin, "2 1")
@@ -147,7 +135,6 @@ func TestChecker_EmptyLines(t *testing.T) {
 	}
 }
 
-// TestChecker_Duplicates — duplicate args: exit 1, stderr = "Error\n".
 func TestChecker_Duplicates(t *testing.T) {
 	stdout, stderr, code := runChecker("", "1 2 2 3")
 	if code != 1 {

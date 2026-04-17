@@ -73,10 +73,9 @@ func TestPa(t *testing.T) {
 		t.Fatalf("Pa b = %v, want [8]", got)
 	}
 
-	// no-op when b is empty
 	Pa(a, b)
-	Pa(a, b) // b now empty
-	Pa(a, b) // should be no-op
+	Pa(a, b)
+	Pa(a, b)
 	if a.Len() != 3 {
 		t.Fatalf("Pa on empty b should be no-op, got len %d", a.Len())
 	}
@@ -93,10 +92,9 @@ func TestPb(t *testing.T) {
 		t.Fatalf("Pb b = %v, want [5]", got)
 	}
 
-	// no-op when a is empty
 	Pb(a, b)
-	Pb(a, b) // a now empty
-	Pb(a, b) // should be no-op
+	Pb(a, b)
+	Pb(a, b)
 	if b.Len() != 2 {
 		t.Fatalf("Pb on empty a should be no-op, got len %d", b.Len())
 	}

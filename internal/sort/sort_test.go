@@ -9,9 +9,6 @@ import (
 	"push-swap/internal/stack"
 )
 
-// requireSorted is the core test helper.
-// It runs SortCollect, checks the op count, replays the ops on a fresh pair of
-// stacks, and verifies that a is sorted and b is empty at the end.
 func requireSorted(t *testing.T, nums []int, maxOps int) {
 	t.Helper()
 
@@ -23,7 +20,6 @@ func requireSorted(t *testing.T, nums []int, maxOps int) {
 		t.Errorf("SortCollect(%v): %d ops, want <= %d", nums, len(ops), maxOps)
 	}
 
-	// Replay on fresh stacks to confirm the ops themselves are correct.
 	a2 := stack.New("a", append([]int(nil), nums...))
 	b2 := stack.New("b", nil)
 	for _, op := range ops {
@@ -40,8 +36,6 @@ func requireSorted(t *testing.T, nums []int, maxOps int) {
 	}
 }
 
-// --- n=0 and n=1 ---
-
 func TestSort_Zero(t *testing.T) {
 	requireSorted(t, []int{}, 0)
 }
@@ -49,8 +43,6 @@ func TestSort_Zero(t *testing.T) {
 func TestSort_One(t *testing.T) {
 	requireSorted(t, []int{42}, 0)
 }
-
-// --- n=2 ---
 
 func TestSort_Two(t *testing.T) {
 	tests := []struct {
@@ -67,10 +59,7 @@ func TestSort_Two(t *testing.T) {
 	}
 }
 
-// --- n=3 ---
-
 func TestSort_Three(t *testing.T) {
-	// All 6 permutations of [1,2,3]
 	perms := [][]int{
 		{1, 2, 3},
 		{1, 3, 2},
@@ -85,8 +74,6 @@ func TestSort_Three(t *testing.T) {
 		})
 	}
 }
-
-// --- n=4: correctness + op count ---
 
 func TestSort_Four(t *testing.T) {
 	tests := [][]int{
@@ -103,8 +90,6 @@ func TestSort_Four(t *testing.T) {
 		})
 	}
 }
-
-// --- n=5: must use fewer than 12 ops ---
 
 func TestSort_Five(t *testing.T) {
 	tests := [][]int{
@@ -126,19 +111,12 @@ func TestSort_Five(t *testing.T) {
 	}
 }
 
-// --- n=6: official audit input must sort in < 9 ops ---
-// The spec only mandates < 9 for the specific audit input "2 1 3 6 5 8".
-// Not all 6-element permutations are solvable in ≤8 ops; those are tested
-// with their true optimal bound.
-
 func TestSort_Six(t *testing.T) {
 	tests := []struct {
 		nums   []int
 		maxOps int
 	}{
-		// Audit input — spec requires < 9 ops
 		{[]int{2, 1, 3, 6, 5, 8}, 8},
-		// Additional permutations solvable in ≤8 ops
 		{[]int{1, 6, 2, 5, 3, 4}, 8},
 		{[]int{6, 1, 5, 2, 4, 3}, 8},
 		{[]int{3, 6, 1, 4, 2, 5}, 8},
@@ -146,9 +124,8 @@ func TestSort_Six(t *testing.T) {
 		{[]int{2, 5, 3, 1, 6, 4}, 8},
 		{[]int{4, 1, 3, 5, 2, 6}, 8},
 		{[]int{6, 4, 2, 1, 3, 5}, 8},
-		// Permutations whose optimal solution exceeds 8 — tested for correctness only
-		{[]int{6, 5, 4, 3, 2, 1}, 10}, // optimal is 10
-		{[]int{4, 2, 6, 1, 5, 3}, 9},  // optimal is 9
+		{[]int{6, 5, 4, 3, 2, 1}, 10},
+		{[]int{4, 2, 6, 1, 5, 3}, 9},
 	}
 	for _, tt := range tests {
 		t.Run(fmt.Sprintf("%v", tt.nums), func(t *testing.T) {
@@ -156,8 +133,6 @@ func TestSort_Six(t *testing.T) {
 		})
 	}
 }
-
-// --- already sorted input ---
 
 func TestSort_AlreadySorted(t *testing.T) {
 	tests := [][]int{
@@ -172,8 +147,6 @@ func TestSort_AlreadySorted(t *testing.T) {
 	}
 }
 
-// --- reverse sorted input ---
-
 func TestSort_ReverseSorted(t *testing.T) {
 	tests := [][]int{
 		{3, 2, 1},
@@ -182,12 +155,10 @@ func TestSort_ReverseSorted(t *testing.T) {
 	}
 	for _, nums := range tests {
 		t.Run(fmt.Sprintf("%v", nums), func(t *testing.T) {
-			requireSorted(t, nums, -1) // no op limit for these
+			requireSorted(t, nums, -1)
 		})
 	}
 }
-
-// --- n=100: must use fewer than 700 ops ---
 
 func TestSort_100_Random(t *testing.T) {
 	seeds := []int64{42, 99, 12345}
@@ -200,8 +171,6 @@ func TestSort_100_Random(t *testing.T) {
 		})
 	}
 }
-
-// --- negative numbers ---
 
 func TestSort_Negatives(t *testing.T) {
 	requireSorted(t, []int{-1, -5, -3, -2, -4}, 11)
