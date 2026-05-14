@@ -1,5 +1,4 @@
-
-# Executables
+# Binaries
 /push-swap
 /checker
 
@@ -9,8 +8,6 @@
 *.dll
 *.so
 *.dylib
-
-# Test binary
 *.test
 
 # Coverage
@@ -20,32 +17,27 @@ coverage.html
 # IDE
 .idea/
 .vscode/
-*.swp
-*.swo
-*~
 
 # OS
 .DS_Store
 Thumbs.db
 
-# Claude Code (development tooling — Theo only, not shared with team)
+# Vim swap files
+*.swp
+*.swo
+*~
+
+# Claude Code — Theo's local dev tooling (not for submission)
+.claude/
+.clauignore
 CLAUDE.md
 CLAUDE.local.md
-.claude/
+
+# Personal/dev-only files (not for submission)
 OFFICIAL_AUDITS.md
 INTRA_SPECS.md
-PROMPT_1_STRUCTURE_GUIDE.md
-PROMPT_2_PROJECT_GENERATOR.md
-.clauignore
-# env file
+IMPORTANT_FOR_main.txt
+PERMISSIONS.md
+
+# Environment
 .env
-
-# Editor/IDE
-.idea/
-.vscode/
-.clauignore
-.claude
-
-# Local development notes (personal, not for team)
-CLAUDE.md
-CLAUDE.local.md
